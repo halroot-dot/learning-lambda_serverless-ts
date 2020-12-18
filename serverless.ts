@@ -100,7 +100,7 @@ const serverlessConfiguration: Serverless = {
                     AttributeDefinitions: [
                         {
                             AttributeName: 'createdTime',
-                            AttributeType: 'S', //Number
+                            AttributeType: 'N', //Number
                         },
                     ],
                     KeySchema: [

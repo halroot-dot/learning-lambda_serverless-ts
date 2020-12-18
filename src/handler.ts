@@ -6,21 +6,6 @@ import * as aws from 'aws-sdk';
 const dynamodb = new aws.DynamoDB.DocumentClient({ region: 'ap-northeast-1' });
 const tablename = 'learning_lambda_typescript';
 
-export const hello: APIGatewayProxyHandler = async (event, _context) => {
-    return {
-        statusCode: 200,
-        body: JSON.stringify(
-            {
-                message:
-                    'Go Serverless Webpack (Typescript) v1.0! Your function executed successfully!',
-                input: event,
-            },
-            null,
-            2
-        ),
-    };
-};
-
 export const postHandler: APIGatewayProxyHandler = async (event, _context) => {
     console.log('event: ', event);
 
@@ -96,7 +81,7 @@ export const deleteHandler: APIGatewayProxyHandler = async (event, _context) => 
 
     const params = {
         TableName: tablename,
-        Key: { createdTime: event.queryStringParameters.createdTime },
+        Key: { createdTime: JSON.parse(event.body).createdTime },
     };
     const result: aws.DynamoDB.GetItemOutput = await dynamodb.delete(params).promise();
     console.log('DELETE result: ', result);

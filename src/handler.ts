@@ -21,38 +21,86 @@ export const hello: APIGatewayProxyHandler = async (event, _context) => {
     };
 };
 
-export const get: APIGatewayProxyHandler = async (event, _context) => {
-    console.log(':Hamster:');
+export const postHandler: APIGatewayProxyHandler = async (event, _context) => {
     console.log('event: ', event);
-    console.log('event.id ', event.id);
+
     const params = {
         TableName: tablename,
-        Key: { id: event.id },
+        Item: {
+            createdTime: JSON.parse(event.body).createdTime,
+            updatedTime: JSON.parse(event.body).updatedTime,
+            text: JSON.parse(event.body).text,
+        },
     };
-    const result: aws.DynamoDB.GetItemOutput = await dynamodb.get(params).promise();
-    console.log('GET result: ', result);
+    console.log(params);
+    const result: aws.DynamoDB.GetItemOutput = await dynamodb.put(params).promise();
+    console.log('POST result: ', result);
+
     return {
         statusCode: 200,
-        body: JSON.stringify(result.Item),
+        body: JSON.stringify(result),
     };
 };
 
-export const put: APIGatewayProxyHandler = async (event, _context) => {
-    console.log(':Hamster:');
-    console.log('event: ', event, event);
-    console.log('event.id: ', event.id);
+export const getHandler: APIGatewayProxyHandler = async (event, _context) => {
+    console.log('event: ', event);
+
+    if (event.queryStringParameters === null) {
+        const params = {
+            TableName: tablename,
+        };
+        const result: aws.DynamoDB.GetItemOutput = await dynamodb.scan(params).promise();
+        console.log('GET All result: ', result);
+        return {
+            statusCode: 200,
+            body: JSON.stringify(result.Items),
+        };
+    } else {
+        const params = {
+            TableName: tablename,
+            Key: { createdTime: event.queryStringParameters.createdTime },
+        };
+        const result: aws.DynamoDB.GetItemOutput = await dynamodb.get(params).promise();
+        console.log('GET result: ', result);
+        return {
+            statusCode: 200,
+            body: JSON.stringify(result.Item),
+        };
+    }
+};
+
+export const putHandler: APIGatewayProxyHandler = async (event, _context) => {
+    console.log('event: ', event);
+
     const params = {
         TableName: tablename,
-        Key: { id: event.id },
-        UpdateExpression: 'set first_name = :f, last_name=:l',
+        Key: { createdTime: event.queryStringParameters.createdTime },
+        UpdateExpression: 'set updatedTime = :u, text=:t',
         ExpressionAttributeValues: {
-            ':f': event.first_name,
-            ':l': event.last_name,
+            ':u': JSON.parse(event.body).updatedTime,
+            ':t': JSON.parse(event.body).text,
         },
         ReturnValues: 'UPDATED_NEW',
     };
     const result: aws.DynamoDB.GetItemOutput = await dynamodb.update(params).promise();
     console.log('PUT result: ', result);
+
+    return {
+        statusCode: 200,
+        body: JSON.stringify(result),
+    };
+};
+
+export const deleteHandler: APIGatewayProxyHandler = async (event, _context) => {
+    console.log('event: ', event);
+
+    const params = {
+        TableName: tablename,
+        Key: { createdTime: event.queryStringParameters.createdTime },
+    };
+    const result: aws.DynamoDB.GetItemOutput = await dynamodb.delete(params).promise();
+    console.log('DELETE result: ', result);
+
     return {
         statusCode: 200,
         body: JSON.stringify(result),

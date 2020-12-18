@@ -45,8 +45,19 @@ const serverlessConfiguration: Serverless = {
     },
     // lambdaの設定
     functions: {
+        postTest: {
+            handler: 'src/handler.postHandler',
+            events: [
+                {
+                    http: {
+                        method: 'post',
+                        path: 'src/handler',
+                    },
+                },
+            ],
+        },
         getTest: {
-            handler: 'src/handler.get',
+            handler: 'src/handler.getHandler',
             events: [
                 {
                     http: {
@@ -57,11 +68,22 @@ const serverlessConfiguration: Serverless = {
             ],
         },
         putTest: {
-            handler: 'src/handler.put',
+            handler: 'src/handler.putHandler',
             events: [
                 {
                     http: {
                         method: 'put',
+                        path: 'src/handler',
+                    },
+                },
+            ],
+        },
+        deleteTest: {
+            handler: 'src/handler.deleteHandler',
+            events: [
+                {
+                    http: {
+                        method: 'delete',
                         path: 'src/handler',
                     },
                 },
@@ -77,13 +99,13 @@ const serverlessConfiguration: Serverless = {
                     TableName: 'learning_lambda_typescript',
                     AttributeDefinitions: [
                         {
-                            AttributeName: 'id',
-                            AttributeType: 'N', //Number
+                            AttributeName: 'createdTime',
+                            AttributeType: 'S', //Number
                         },
                     ],
                     KeySchema: [
                         {
-                            AttributeName: 'id',
+                            AttributeName: 'createdTime',
                             KeyType: 'HASH',
                         },
                     ],
